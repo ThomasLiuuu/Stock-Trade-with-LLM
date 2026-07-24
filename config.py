@@ -53,3 +53,8 @@ MIN_MESSAGES_FOR_SIGNAL = 3        # Need at least this many articles to generat
 # Output Settings
 # ---------------------------------------------------------------------------
 OUTPUT_CSV = "signals_output.csv"
+
+# ---------------------------------------------------------------------------
+# Flask Settings
+# ---------------------------------------------------------------------------
+FLASK_PORT = 5000
