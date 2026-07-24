@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trading Signal Scanner — aggregate news sentiment from Finnhub and Yahoo Finance to generate BUY/SELL/HOLD signals.">
+    <title>Trading Signal Scanner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="logo">Signal<span class="logo-accent">Scanner</span></h1>
+            <span class="header-subtitle">Finnhub + Yahoo Finance</span>
+        </div>
+        <div class="header-right">
+            <span class="scan-timestamp" id="scanTimestamp"></span>
+            <button class="btn btn-primary" id="scanBtn" onclick="runScan()">
+                <span class="btn-icon">&#9656;</span>
+                Scan Now
+            </button>
+        </div>
+    </header>
+
+    <!-- Watchlist Bar -->
+    <section class="watchlist-bar">
+        <div class="watchlist-label">Watchlist</div>
+        <div class="watchlist-chips" id="watchlistChips">
+            <!-- Chips rendered by JS -->
+        </div>
+        <div class="watchlist-add">
+            <input
+                type="text"
+                id="addTickerInput"
+                class="input-ticker"
+                placeholder="Add ticker..."
+                maxlength="6"
+                onkeydown="if(event.key==='Enter') addTicker()"
+            >
+            <button class="btn btn-small" onclick="addTicker()">+</button>
+        </div>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Scanning tickers...</div>
+    </div>
+
+    <!-- Signal Table -->
+    <main class="main-content">
+        <div class="table-card">
+            <div class="table-header">
+                <h2>Signal Results</h2>
+                <span class="table-count" id="tableCount"></span>
+            </div>
+            <div class="table-wrapper">
+                <table class="signal-table" id="signalTable">
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>Bullish</th>
+                            <th>Bearish</th>
+                            <th>Finnhub</th>
+                            <th>Yahoo</th>
+                            <th>Combined</th>
+                            <th>Articles</th>
+                            <th>Signal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="signalTableBody">
+                        <tr class="empty-row">
+                            <td colspan="10">Click <strong>Scan Now</strong> to fetch signals</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards" id="summaryCards" style="display:none;">
+            <div class="summary-card summary-buy">
+                <div class="summary-value" id="buyCount">0</div>
+                <div class="summary-label">BUY</div>
+            </div>
+            <div class="summary-card summary-sell">
+                <div class="summary-value" id="sellCount">0</div>
+                <div class="summary-label">SELL</div>
+            </div>
+            <div class="summary-card summary-hold">
+                <div class="summary-value" id="holdCount">0</div>
+                <div class="summary-label">HOLD</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Ticker Detail Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal" id="detailModal">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-ticker" id="modalTicker"></h2>
+                    <span class="modal-signal" id="modalSignal"></span>
+                </div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-stats" id="modalStats"></div>
+                <div class="modal-section">
+                    <h3>Finnhub News</h3>
+                    <div class="news-list" id="finnhubNewsList">
+                        <div class="news-loading">Loading articles...</div>
+                    </div>
+                </div>
+                <div class="modal-section">
+                    <h3>Yahoo Finance News</h3>
+                    <div class="news-list" id="yahooNewsList">
+                        <div class="news-loading">Loading articles...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
