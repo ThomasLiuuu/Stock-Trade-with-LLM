@@ -1,0 +1,14 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Output files
+signals_output.csv
+
+# IDE
+.vscode/
+.idea/
