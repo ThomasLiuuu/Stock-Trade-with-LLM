@@ -10,7 +10,7 @@ from flask import Flask, render_template, jsonify, request
 import config
 from scraper import fetch_finnhub_news, fetch_yahoo_news
 from sentiment import score_articles, aggregate_sentiment
-from signals import generate_signal, fetch_price_info
+from signals import generate_signal, fetch_price_info, fetch_all_prices
 
 
 app = Flask(__name__)
@@ -34,7 +34,8 @@ def index():
 # ---------------------------------------------------------------------------
 
 def _process_ticker(ticker: str) -> dict:
-    """Run the full signal pipeline for a single ticker."""
+    """Run the full signal pipeline for a single ticker.
+    Prices should be pre-fetched via fetch_all_prices() before calling this."""
     finnhub_articles = fetch_finnhub_news(ticker)
     time.sleep(0.4)
 
@@ -47,8 +48,8 @@ def _process_ticker(ticker: str) -> dict:
     finnhub_summary = aggregate_sentiment(scored_finnhub)
     yahoo_summary = aggregate_sentiment(scored_yahoo)
 
+    # Price comes from the in-memory cache (batch pre-fetched)
     price_info = fetch_price_info(ticker)
-    time.sleep(0.3)
 
     signal = generate_signal(ticker, finnhub_summary, yahoo_summary, price_info)
     return signal
@@ -57,6 +58,9 @@ def _process_ticker(ticker: str) -> dict:
 @app.route("/api/scan")
 def scan():
     """Run the pipeline across the full watchlist and return results as JSON."""
+    # Batch fetch all prices in a single request (cached in memory)
+    fetch_all_prices(watchlist)
+
     results = []
     for ticker in watchlist:
         try:

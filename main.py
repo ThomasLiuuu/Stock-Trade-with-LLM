@@ -12,7 +12,7 @@ import pandas as pd
 import config
 from scraper import fetch_finnhub_news, fetch_yahoo_news
 from sentiment import score_articles, aggregate_sentiment
-from signals import generate_signal, fetch_price_info
+from signals import generate_signal, fetch_price_info, fetch_all_prices
 
 # Force UTF-8 output on Windows to handle special characters
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
@@ -35,9 +35,8 @@ def process_ticker(ticker: str) -> dict:
     finnhub_summary = aggregate_sentiment(scored_finnhub)
     yahoo_summary = aggregate_sentiment(scored_yahoo)
 
-    # 3. Fetch price
+    # 3. Price comes from the in-memory cache (batch pre-fetched)
     price_info = fetch_price_info(ticker)
-    time.sleep(0.5)
 
     # 4. Generate combined signal
     signal = generate_signal(ticker, finnhub_summary, yahoo_summary, price_info)
@@ -121,6 +120,11 @@ def main():
     print()
     print(f"  Scanning {len(watchlist)} tickers...")
     print(f"  Sources: Finnhub (company news) + Yahoo Finance (news)")
+    print()
+
+    # Batch fetch all prices in one request
+    print("  Fetching prices...")
+    fetch_all_prices(watchlist)
     print()
 
     results = []
