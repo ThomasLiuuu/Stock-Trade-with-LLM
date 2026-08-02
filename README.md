@@ -63,7 +63,7 @@ python main.py
 | `config.py` | Central configuration. Loads the Finnhub API key from `.env`, defines the default watchlist, scraper settings, signal thresholds, and Flask port. |
 | `scraper.py` | Data fetching. Contains `fetch_finnhub_news()` for the Finnhub company news API and `fetch_yahoo_news()` for Yahoo Finance news via yfinance. Both return normalized article dicts. |
 | `sentiment.py` | Sentiment scoring. Uses VADER to score news headlines on a −1 to +1 scale. Provides `score_articles()` for per-article scoring and `aggregate_sentiment()` for summary statistics. |
-| `signals.py` | Signal generation. Blends sentiment from both sources (weighted by article count), fetches live prices from yfinance, and outputs BUY / SELL / HOLD based on configurable thresholds. |
+| `signals.py` | Signal generation. Blends sentiment from both sources (weighted by article count), fetches prices via batch `yf.download()` (single request for all tickers), and outputs BUY / SELL / HOLD. Includes an in-memory cache (5-min TTL, cleared on restart) and retry with backoff to handle rate limits. Falls back to the most recent historical close when the market is closed. |
 | `templates/index.html` | Dashboard HTML. Single-page app with a signal table, watchlist management bar, summary cards, and a ticker detail modal. |
 | `static/style.css` | Dashboard styling. Dark theme with glassmorphism cards, gradient accents, color-coded signals, and responsive layout. |
 | `static/app.js` | Dashboard logic. Handles API calls for scanning, watchlist CRUD, dynamic table rendering, and the ticker detail modal with per-article sentiment display. |
